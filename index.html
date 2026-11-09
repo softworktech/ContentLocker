@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HD Video Stream</title>
+  <link rel="shortcut icon" href="assets/icons/play.svg" type="image/x-icon">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Main Video Player Container (Simulated Video Player UI) -->
+  <div class="video-container" id="video-container" tabindex="0">
+    
+    <!-- Realistic Cinematic Video Backdrop (No video file needed) -->
+    <div class="video-backdrop-wrap" id="video-backdrop-wrap">
+      <div class="video-poster-img" id="video-poster-img"></div>
+      <div class="video-ambient-glow"></div>
+    </div>
+
+    <!-- Hidden audio/video placeholder to satisfy 3rd party script checks -->
+    <video id="video-player" style="display:none;" playsinline preload="none"></video>
+
+    <!-- Top & Bottom Cinematic Gradient Shadows -->
+    <div class="overlay-gradient-top"></div>
+    <div class="overlay-gradient-bottom"></div>
+
+    <!-- Header / Top Bar Controls -->
+    <header class="player-header" id="player-header">
+      <div class="player-header__left">
+        <button class="icon-btn" id="btn-back" title="Close / Back" aria-label="Close">
+          <img src="assets/icons/close.svg" alt="Close" class="icon-img icon-btn__close">
+        </button>
+        <div class="player-header__info">
+          <span class="video-badge">HD 1080p</span>
+          <span class="live-indicator"><span class="live-dot"></span>STREAM</span>
+          <h1 class="video-title" id="video-title">Featured Premium Video Stream</h1>
+        </div>
+      </div>
+
+      <div class="player-header__right">
+        <!-- Button to trigger Content Locker -->
+        <button class="locker-toggle-btn" id="btn-toggle-locker" title="Unlock Video">
+          <span class="locker-icon">🔒</span>
+          <span class="locker-btn-text">Unlock Video</span>
+        </button>
+
+        <button class="icon-btn icon-btn--like" id="btn-like" title="Like" aria-label="Like">
+          <img src="assets/icons/like.svg" alt="Like" class="icon-img icon-btn__like">
+          <span class="like-counter" id="like-counter">14.8K</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Center Play/Pause & Big Animated Loader -->
+    <div class="player-center" id="player-center">
+      
+      <!-- Big Center Play Button -->
+      <button class="center-play-btn" id="center-play-btn" aria-label="Play / Pause">
+        <img src="assets/icons/play.svg" alt="Play" id="center-play-icon" class="center-play-icon">
+      </button>
+
+      <!-- Big, Beautiful Glowing Video Loader -->
+      <div class="video-loader" id="video-loader" aria-hidden="true">
+        <div class="loader-rings-wrapper">
+          <div class="loader-ring outer-ring"></div>
+          <div class="loader-ring middle-ring"></div>
+          <div class="loader-ring inner-ring"></div>
+          <div class="loader-core">
+            <span class="loader-pulse-dot"></span>
+          </div>
+        </div>
+        <div class="loader-text-wrap">
+          <span class="loader-title">Buffering HD Stream</span>
+          <span class="loader-dots">
+            <span>.</span><span>.</span><span>.</span>
+          </span>
+        </div>
+        <span class="loader-subtitle">Connecting to high-speed secure server...</span>
+      </div>
+
+    </div>
+
+    <!-- Bottom Player Controls -->
+    <footer class="player-footer" id="player-footer">
+      
+      <!-- Interactive Progress / Seek Bar -->
+      <div class="progress-container" id="progress-container">
+        <div class="progress-tooltip" id="progress-tooltip">00:00:24</div>
+        <div class="progress-track">
+          <div class="progress-buffer" id="progress-buffer" style="width: 55%;"></div>
+          <div class="progress-current" id="progress-current" style="width: 14%;"></div>
+        </div>
+        <div class="progress-thumb" id="progress-thumb" style="left: 14%;"></div>
+      </div>
+
+      <!-- Control Buttons Row -->
+      <div class="player-controls">
+        
+        <!-- Left Controls: Play/Pause & Time -->
+        <div class="player-controls__left">
+          <button class="ctrl-btn" id="btn-play-pause" title="Play (Space / K)" aria-label="Play">
+            <img src="assets/icons/footer-play.svg" alt="Play" id="footer-play-icon" class="ctrl-icon">
+          </button>
+
+          <div class="time-display">
+            <span id="current-time">00:00:24</span>
+            <span class="time-separator">/</span>
+            <span id="duration-time">01:48:35</span>
+          </div>
+        </div>
+
+        <!-- Right Controls: Volume, Settings, PiP, Fullscreen -->
+        <div class="player-controls__right">
+          
+          <!-- Quick Loader Demo Button (for testing loader) -->
+          <button class="ctrl-btn test-loader-btn" id="btn-toggle-loader" title="Toggle Big Video Loader Test" aria-label="Toggle Loader">
+            <span class="test-loader-icon">⏳</span>
+          </button>
+
+          <!-- Volume Controls -->
+          <div class="volume-container">
+            <button class="ctrl-btn" id="btn-volume" title="Mute (M)" aria-label="Mute">
+              <img src="assets/icons/volume.svg" alt="Volume" id="volume-icon" class="ctrl-icon">
+            </button>
+            <div class="volume-slider-wrap">
+              <input type="range" class="volume-slider" id="volume-slider" min="0" max="1" step="0.05" value="1" title="Volume">
+            </div>
+          </div>
+
+          <!-- Settings Dropdown -->
+          <div class="settings-container">
+            <button class="ctrl-btn" id="btn-settings" title="Settings" aria-label="Settings">
+              <img src="assets/icons/settings.svg" alt="Settings" class="ctrl-icon">
+            </button>
+            <div class="settings-menu" id="settings-menu">
+              <div class="settings-menu__title">Player Settings</div>
+              <div class="settings-menu__item" data-setting="quality">
+                <span class="settings-menu__label">Quality</span>
+                <span class="settings-menu__value">1080p HD</span>
+              </div>
+              <div class="settings-menu__item" data-setting="speed">
+                <span class="settings-menu__label">Speed</span>
+                <span class="settings-menu__value">1x (Normal)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Picture in Picture (PiP) -->
+          <button class="ctrl-btn" id="btn-pip" title="Picture in Picture" aria-label="Picture in Picture">
+            <img src="assets/icons/pip.svg" alt="Picture in Picture" class="ctrl-icon">
+          </button>
+
+          <!-- Fullscreen Toggle -->
+          <button class="ctrl-btn" id="btn-fullscreen" title="Fullscreen (F)" aria-label="Fullscreen">
+            <img src="assets/icons/fullscreen.svg" alt="Fullscreen" id="fullscreen-icon" class="ctrl-icon">
+          </button>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- 🔒 RIDEFILES / CPAGRIP CONTENT LOCKER SCRIPT            -->
+  <!-- ======================================================== -->
+  <script type="text/javascript" src="https://ridefiles.net/script_include.php?id=1921106"></script>
+
+  <!-- Player Controller Script -->
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

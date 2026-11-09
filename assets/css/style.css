@@ -1,0 +1,1212 @@
+
+:root {
+  --primary-color: #3b82f6;
+  --primary-hover: #60a5fa;
+  --primary-glow: rgba(59, 130, 246, 0.45);
+  --accent-cyan: #06b6d4;
+  --accent-green: #10b981;
+  --bg-dark: #07080a;
+  --surface-dark: rgba(15, 17, 23, 0.9);
+  --surface-glass: rgba(255, 255, 255, 0.08);
+  --text-main: #ffffff;
+  --text-muted: #94a3b8;
+  --control-hover: rgba(255, 255, 255, 0.16);
+  --progress-track: rgba(255, 255, 255, 0.2);
+  --progress-buffer: rgba(255, 255, 255, 0.4);
+  --transition-fast: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-dark);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text-main);
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ================= Video Container ================= */
+.video-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000;
+  overflow: hidden;
+  outline: none;
+}
+
+/* Realistic Video Backdrop Wrap (Simulated Video UI) */
+.video-backdrop-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.video-poster-img {
+  width: 100%;
+  height: 100%;
+  background-image: url('https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=1920&q=80');
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.6s ease, filter 0.5s ease;
+}
+
+.video-backdrop-wrap:hover .video-poster-img {
+  transform: scale(1.02);
+}
+
+.video-ambient-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(59, 130, 246, 0.08) 0%, rgba(0, 0, 0, 0.45) 70%, rgba(0, 0, 0, 0.85) 100%);
+  pointer-events: none;
+}
+
+/* Video blur when locker overlay is active */
+.video-container.offers-active .video-poster-img,
+.video-container.offers-active .video-player {
+  filter: blur(14px) brightness(0.5);
+}
+
+/* Gradient Overlays for readable controls */
+.overlay-gradient-top,
+.overlay-gradient-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity var(--transition-normal);
+}
+
+.overlay-gradient-top {
+  top: 0;
+  height: 140px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+.overlay-gradient-bottom {
+  bottom: 0;
+  height: 160px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+/* Auto-hide controls when inactive */
+.video-container.controls-hidden .player-header,
+.video-container.controls-hidden .player-footer,
+.video-container.controls-hidden .overlay-gradient-top,
+.video-container.controls-hidden .overlay-gradient-bottom {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.video-container.controls-hidden {
+  cursor: none;
+}
+
+/* ================= Header Controls ================= */
+.player-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 22px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 25;
+  transition: opacity var(--transition-normal);
+}
+
+.player-header__left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.player-header__info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.video-badge {
+  background: rgba(59, 130, 246, 0.22);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  color: #60a5fa;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #f87171;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #ef4444;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #ef4444;
+  animation: pulseLive 1.4s infinite;
+}
+
+@keyframes pulseLive {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.video-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 420px;
+}
+
+.player-header__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Locker Toggle Button */
+.locker-toggle-btn {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.25), rgba(249, 115, 22, 0.25));
+  border: 1px solid rgba(234, 179, 8, 0.6);
+  color: #fef08a;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: transform var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.locker-toggle-btn:hover {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.45), rgba(249, 115, 22, 0.45));
+  transform: scale(1.05);
+  box-shadow: 0 0 16px rgba(234, 179, 8, 0.4);
+}
+
+/* Header Icon Buttons */
+.icon-btn {
+  background: var(--surface-glass);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+  backdrop-filter: blur(10px);
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: scale(1.06);
+}
+
+.icon-btn__close {
+  width: 20px;
+  height: 20px;
+}
+
+/* Like Button */
+.icon-btn--like {
+  width: auto;
+  border-radius: 22px;
+  padding: 0 16px 0 12px;
+  gap: 8px;
+}
+
+.icon-btn__like {
+  width: 19px;
+  height: 19px;
+}
+
+.like-counter {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.icon-btn--like.active {
+  background: #1f75df;
+  border-color: #3b82f6;
+  box-shadow: 0 0 14px rgba(31, 117, 223, 0.5);
+}
+
+/* ================= Center Action Area ================= */
+.player-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.center-play-btn {
+  pointer-events: auto;
+  background: rgba(10, 12, 18, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  width: 86px;
+  height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background var(--transition-fast), border-color var(--transition-fast);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(59, 130, 246, 0.2);
+}
+
+.center-play-btn:hover {
+  transform: scale(1.14);
+  background: rgba(59, 130, 246, 0.35);
+  border-color: #60a5fa;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 35px var(--primary-glow);
+}
+
+.center-play-icon {
+  width: 38px;
+  height: 38px;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
+}
+
+/* ========================================================
+   ✨ BIG, BEAUTIFUL GLOWING VIDEO LOADER
+   ======================================================== */
+.video-loader {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  pointer-events: none;
+  animation: fadeIn 0.3s ease;
+}
+
+/* When loading class is added to player-center */
+.player-center.loading .center-play-btn {
+  display: none;
+}
+
+.player-center.loading .video-loader {
+  display: flex;
+}
+
+/* Rings Container */
+.loader-rings-wrapper {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Outer Ring */
+.loader-ring.outer-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  border-top-color: var(--accent-cyan);
+  border-right-color: var(--primary-color);
+  box-shadow: 0 0 24px rgba(6, 182, 212, 0.45);
+  animation: spinClockwise 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+/* Middle Ring */
+.loader-ring.middle-ring {
+  position: absolute;
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  border: 3px dashed rgba(255, 255, 255, 0.25);
+  border-bottom-color: #60a5fa;
+  animation: spinCounterClockwise 1.8s linear infinite;
+}
+
+/* Inner Ring */
+.loader-ring.inner-ring {
+  position: absolute;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-left-color: #38bdf8;
+  border-top-color: #818cf8;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+  animation: spinClockwise 0.9s linear infinite;
+}
+
+/* Pulsing Core */
+.loader-core {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #38bdf8 0%, rgba(59, 130, 246, 0.4) 70%, transparent 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-pulse-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 12px #38bdf8;
+  animation: corePulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes spinClockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spinCounterClockwise {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes corePulse {
+  0% { transform: scale(0.7); opacity: 0.6; }
+  100% { transform: scale(1.3); opacity: 1; }
+}
+
+/* Loader Text & Animated Dots */
+.loader-text-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8), 0 0 18px rgba(59, 130, 246, 0.6);
+}
+
+.loader-dots span {
+  animation: blinkDots 1.4s infinite;
+  opacity: 0;
+}
+
+.loader-dots span:nth-child(1) { animation-delay: 0.2s; }
+.loader-dots span:nth-child(2) { animation-delay: 0.4s; }
+.loader-dots span:nth-child(3) { animation-delay: 0.6s; }
+
+@keyframes blinkDots {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.loader-subtitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.2px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
+}
+
+/* ========================================================
+   🚀 FLOATING OFFERS OVERLAY (NO CARD BG - 1 ROW OFFERS)
+   ======================================================== */
+.content-locker-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 50;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.content-locker-overlay.open {
+  display: flex;
+  opacity: 1;
+}
+
+/* ========================================================
+   🔒 RIDEFILES / CPAGRIP LOCKER ULTRA-MODERN STYLING
+   ======================================================== */
+
+/* Prevent RideFiles placeholder from intercepting clicks */
+#place_holder {
+  display: none !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: static !important;
+  visibility: hidden !important;
+}
+
+/* 1. Backdrop Overlay: Clean modern frosted dark blur (Removes ugly diagonal hatch) */
+div[id$="Overlay"],
+div[id*="Overlay"],
+#colorboxOverlay {
+  background: rgba(0, 0, 0, 0.85) !important;
+  background-image: none !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  opacity: 1 !important;
+  z-index: 99998 !important;
+}
+
+/* 2. Hide old 90s ColorBox 9-slice image borders and slices */
+div[id$="TopLeft"],
+div[id$="TopCenter"],
+div[id$="TopRight"],
+div[id$="MiddleLeft"],
+div[id$="MiddleRight"],
+div[id$="BottomLeft"],
+div[id$="BottomCenter"],
+div[id$="BottomRight"],
+div[id*="TopLeft"],
+div[id*="TopCenter"],
+div[id*="TopRight"],
+div[id*="MiddleLeft"],
+div[id*="MiddleRight"],
+div[id*="BottomLeft"],
+div[id*="BottomCenter"],
+div[id*="BottomRight"] {
+  display: none !important;
+  visibility: hidden !important;
+  background: none !important;
+  border: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  line-height: 0 !important;
+}
+
+/* 3. Outermost ColorBox Container: Centered, Fluid, Responsive (NO RIGID BOX) */
+div[id$="Overlay"] + div,
+div[id*="Overlay"] + div,
+div:has(> div[id$="Wrapper"]),
+div:has(> div[id*="Wrapper"]),
+#colorbox {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(92vw, 560px) !important;
+  max-width: 560px !important;
+  height: auto !important;
+  min-height: auto !important;
+  max-height: 90vh !important;
+  overflow: visible !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  z-index: 99999 !important;
+}
+
+/* 4. Fluid Wrapper & Unclipped Content (Box System Completely Removed) */
+div[id$="Wrapper"],
+div[id*="Wrapper"] {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: auto !important;
+  overflow: visible !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+div[id$="Content"],
+div[id*="Content"] {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  float: none !important;
+  clear: both !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: auto !important;
+  overflow: visible !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+div[id$="LoadedContent"],
+div[id*="LoadedContent"] {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: auto !important;
+  overflow: visible !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Clear any child containers inside LoadedContent */
+div[id$="LoadedContent"] > div,
+div[id*="LoadedContent"] > div,
+div[id^="prp"],
+div[id^="hln"],
+#prp1i6n {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  overflow: visible !important;
+  background: transparent !important;
+  border: none !important;
+  color: #ffffff !important;
+  box-sizing: border-box !important;
+}
+
+/* Hide overlapping ColorBox Title that collided with the links */
+div[id$="Title"],
+div[id*="Title"],
+#cboxTitle,
+#colorboxTitle {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  top: -9999px !important;
+}
+
+/* 5. Header Styling: Responsive, clean, centered & NEVER clipped */
+#txtheader {
+  text-align: center !important;
+  margin-bottom: 24px !important;
+  padding: 0 8px !important;
+  border: none !important;
+  background: transparent !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+#txtheader div {
+  width: 100% !important;
+  text-align: center !important;
+}
+
+#txtheader font {
+  display: block !important;
+  width: 100% !important;
+  color: #ffffff !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  font-size: clamp(17px, 4.2vw, 24px) !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  letter-spacing: -0.2px !important;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.95), 0 0 35px rgba(0, 0, 0, 0.9) !important;
+  word-wrap: break-word !important;
+  word-break: normal !important;
+  white-space: normal !important;
+}
+
+/* Modern Lock Badge directly generated in CSS */
+#txtheader::before {
+  content: '🔒 ANTI-BOT VERIFICATION';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px auto;
+  background: rgba(234, 179, 8, 0.2);
+  border: 1px solid rgba(234, 179, 8, 0.6);
+  color: #fde047;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  padding: 5px 16px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* 6. Offer List Styling: Clean, fluid, no-card layout */
+#offerlst {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 8px !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+#offerload {
+  display: none !important;
+}
+
+.each_p_elm {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 7. Offer Links: Turn into sleek, responsive interactive buttons */
+.link_a,
+.link_a:link,
+.link_a:visited {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  background: rgba(15, 23, 42, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-radius: 14px !important;
+  padding: 16px 20px !important;
+  color: #ffffff !important;
+  text-decoration: none !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  font-size: clamp(14px, 3.4vw, 16px) !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  word-break: break-word !important;
+  white-space: normal !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.link_a:hover {
+  background: rgba(30, 41, 59, 0.95) !important;
+  border-color: #38bdf8 !important;
+  color: #38bdf8 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.75), 0 0 20px rgba(56, 189, 248, 0.4) !important;
+}
+
+.link_a:active {
+  transform: translateY(0) !important;
+}
+
+/* Action arrow icon at the end of each offer button */
+.link_a::after {
+  content: '➔';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  width: 32px;
+  height: 32px;
+  background: rgba(56, 189, 248, 0.2);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 50%;
+  color: #38bdf8;
+  font-size: 14px;
+  margin-left: 14px;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.link_a:hover::after {
+  background: #0284c7;
+  color: #ffffff;
+  transform: translateX(3px);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+}
+
+/* 8. Waiting / Verification and Loading States */
+#offerwait,
+#offerload {
+  color: #94a3b8 !important;
+  text-align: center !important;
+  padding: 16px 0 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+.txt_goback {
+  color: #e2e8f0 !important;
+  font-size: 13px !important;
+}
+
+.btn_back {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  color: #38bdf8 !important;
+  margin-bottom: 10px !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+}
+
+.btn_back:hover {
+  color: #60a5fa !important;
+  text-decoration: underline !important;
+}
+
+.txt_wait {
+  color: #94a3b8 !important;
+  font-size: 13px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.cpa-script-target {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ================= Bottom Player Controls ================= */
+.player-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 10px 24px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 25;
+  transition: opacity var(--transition-normal);
+}
+
+/* Progress / Seek Bar */
+.progress-container {
+  position: relative;
+  width: 100%;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.progress-track {
+  position: relative;
+  width: 100%;
+  height: 5px;
+  background: var(--progress-track);
+  border-radius: 3px;
+  transition: height var(--transition-fast);
+  overflow: hidden;
+}
+
+.progress-container:hover .progress-track {
+  height: 7px;
+}
+
+.progress-buffer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--progress-buffer);
+  border-radius: 3px;
+  transition: width 0.2s ease;
+}
+
+.progress-current {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb, #38bdf8);
+  border-radius: 3px;
+  transition: width 0.08s linear;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+.progress-thumb {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);
+  pointer-events: none;
+}
+
+.progress-container:hover .progress-thumb {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.progress-tooltip {
+  position: absolute;
+  bottom: 26px;
+  left: 0;
+  transform: translateX(-50%);
+  background: rgba(15, 17, 23, 0.95);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  white-space: nowrap;
+}
+
+.progress-container:hover .progress-tooltip {
+  opacity: 1;
+}
+
+/* Controls Buttons Bar */
+.player-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.player-controls__left,
+.player-controls__right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Control Icon Button */
+.ctrl-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+  color: #fff;
+}
+
+.ctrl-btn:hover {
+  background: var(--control-hover);
+  transform: scale(1.08);
+}
+
+.ctrl-btn:active {
+  transform: scale(0.94);
+}
+
+.ctrl-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.test-loader-btn {
+  font-size: 16px;
+  padding: 6px 10px;
+}
+
+/* Time Display */
+.time-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #e2e8f0;
+  letter-spacing: 0.3px;
+  font-variant-numeric: tabular-nums;
+  margin-left: 4px;
+}
+
+.time-separator {
+  color: var(--text-muted);
+}
+
+/* Volume Slider */
+.volume-container {
+  display: flex;
+  align-items: center;
+}
+
+.volume-slider-wrap {
+  width: 0;
+  overflow: hidden;
+  transition: width var(--transition-normal), opacity var(--transition-normal);
+  opacity: 0;
+  display: flex;
+  align-items: center;
+}
+
+.volume-container:hover .volume-slider-wrap,
+.volume-slider-wrap:focus-within {
+  width: 76px;
+  opacity: 1;
+  margin-left: 6px;
+}
+
+.volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Settings Menu */
+.settings-container {
+  position: relative;
+}
+
+.settings-menu {
+  position: absolute;
+  bottom: 46px;
+  right: 0;
+  width: 210px;
+  background: var(--surface-dark);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  padding: 8px 0;
+  display: none;
+  flex-direction: column;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7);
+  z-index: 30;
+}
+
+.settings-menu.open {
+  display: flex;
+  animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.settings-menu__title {
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 4px;
+}
+
+.settings-menu__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  font-size: 13px;
+  color: #fff;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.settings-menu__item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.settings-menu__value {
+  color: #60a5fa;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ================= Responsive Mobile Styles ================= */
+@media (max-width: 768px) {
+  .player-header {
+    padding: 14px 16px;
+  }
+
+  .video-title {
+    max-width: 140px;
+    font-size: 14px;
+  }
+
+  .locker-btn-text {
+    display: none;
+  }
+
+  .locker-toggle-btn {
+    padding: 6px 10px;
+  }
+
+  .player-footer {
+    padding: 8px 14px 16px 14px;
+  }
+
+  .player-controls__left,
+  .player-controls__right {
+    gap: 8px;
+  }
+
+  .time-display {
+    font-size: 12px;
+  }
+
+  .center-play-btn {
+    width: 68px;
+    height: 68px;
+  }
+
+  .center-play-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .loader-rings-wrapper {
+    width: 86px;
+    height: 86px;
+  }
+
+  .loader-ring.middle-ring {
+    width: 64px;
+    height: 64px;
+  }
+
+  .loader-ring.inner-ring {
+    width: 44px;
+    height: 44px;
+  }
+
+  .loader-text-wrap {
+    font-size: 15px;
+  }
+
+  .volume-slider-wrap {
+    display: none;
+  }
+
+  .floating-title {
+    font-size: 20px;
+  }
+
+  .floating-subtitle {
+    font-size: 13px;
+  }
+
+  .offers-horizontal-row {
+    justify-content: flex-start;
+    padding-bottom: 12px;
+  }
+
+  .offer-row-item {
+    min-width: 260px;
+    padding: 12px 14px;
+  }
+}
