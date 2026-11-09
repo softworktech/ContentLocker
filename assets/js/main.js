@@ -7,9 +7,15 @@
  * ===================================================================
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+// ===================================================================
+// ⏱️ AUTO-LOCKER TIMER SETTINGS (অটো অফার ভেসে ওঠার সময়)
+// ===================================================================
+// 👉 0 দেওয়া থাকলে পেজে ঢোকার পর কোনো অটো-পপআপ আসবে না।
+// 👉 ইউজার প্লে (Play) বাটনে ক্লিক করলেই অফার ভেসে উঠবে।
+// 👉 আপনি যদি ভবিষ্যতে অটো-পপআপ চান, তবে 0 এর জায়গায় 5 বা 10 সেকেন্ড লিখে দিতে পারেন।
+const OFFER_DELAY_SECONDS = 0;
 
-  const OFFER_DELAY_SECONDS = 5;
+document.addEventListener('DOMContentLoaded', () => {
 
   // ===================================================================
   // DOM Elements
@@ -59,36 +65,35 @@ document.addEventListener('DOMContentLoaded', () => {
   const totalMockDuration = 6515;
   let currentMockSeconds = 24;
 
-
+  // ===================================================================
+  // 1. RIDEFILES / CPAGRIP LOCKER TRIGGER (CONTROLLED & SAFE)
+  // ===================================================================
   function triggerRideFilesLocker() {
-    hideLoader();
+    showLoader();
 
-    // Remove any blocking placeholder
-    const placeholder = document.getElementById('place_holder');
-    if (placeholder) {
-      placeholder.remove();
-    }
-
-    // Call RideFiles native function if ready
-    if (typeof call_locker === 'function') {
-      try {
-        call_locker();
-      } catch (err) {
-        console.warn('Locker trigger notice:', err);
+    setTimeout(() => {
+      // Remove any blocking placeholder
+      const placeholder = document.getElementById('place_holder');
+      if (placeholder) {
+        placeholder.remove();
       }
-    } else {
-      // Retry once after 600ms if script is still downloading
-      setTimeout(() => {
-        if (typeof call_locker === 'function') {
-          try {
-            call_locker();
-          } catch(e) {}
+
+      // Unlock modal visibility in CSS
+      document.body.classList.add('locker-unlocked');
+      hideLoader();
+
+      // Ensure Colorbox opens
+      if (typeof call_locker === 'function') {
+        try {
+          call_locker();
+        } catch (err) {
+          console.warn('Locker trigger notice:', err);
         }
-      }, 600);
-    }
+      }
+    }, 600);
   }
 
-  // Auto-trigger once after OFFER_DELAY_SECONDS
+  // Auto-trigger once after OFFER_DELAY_SECONDS (only if > 0)
   if (OFFER_DELAY_SECONDS > 0) {
     setTimeout(triggerRideFilesLocker, OFFER_DELAY_SECONDS * 1000);
   }
@@ -105,10 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 2. PLAY ACTION SIMULATION (LOADER ➔ LOCKER)
   // ===================================================================
   function handlePlayRequest() {
-    showLoader();
-    setTimeout(() => {
-      triggerRideFilesLocker();
-    }, 600);
+    triggerRideFilesLocker();
   }
 
   centerPlayBtn.addEventListener('click', (e) => {

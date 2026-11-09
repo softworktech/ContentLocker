@@ -508,6 +508,18 @@ html, body {
   visibility: hidden !important;
 }
 
+/* While locker is locked (not yet triggered by Play click or timer), keep Colorbox completely hidden */
+body:not(.locker-unlocked) div[id$="Overlay"],
+body:not(.locker-unlocked) div[id*="Overlay"],
+body:not(.locker-unlocked) div[id$="Overlay"] + div,
+body:not(.locker-unlocked) div:has(> div[id$="Wrapper"]),
+body:not(.locker-unlocked) #colorbox {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 /* 1. Backdrop Overlay: Clean modern frosted dark blur (Removes ugly diagonal hatch) */
 div[id$="Overlay"],
 div[id*="Overlay"],
